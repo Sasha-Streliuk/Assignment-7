@@ -29,7 +29,19 @@ def get_first_10(medalists):
 
 
 def get_total_medals(medalists):
-    pass
+    # ID-0, Name-1, Sex-2, Age-3, Height-4, Weight-5, Team-6, NOC-7, Games-8, Year-9, Season-10, City-11, Sport-12, Event-13, Medal-14
+    gold = 0
+    silver = 0
+    bronze = 0
+    for item in medalists:
+        if item[14].strip().lower() == 'gold':
+            gold += 1
+        elif item[14].strip().lower() == 'silver':
+            silver += 1
+        elif item[14].strip().lower() == 'bronze':
+            bronze += 1
+
+    return gold, silver, bronze
 
 
 def save_to_file(file_name, first_10, total_medals):
