@@ -20,7 +20,12 @@ def get_medalists(file_name, country, year):
 
 
 def get_first_10(medalists):
-    pass
+    # ID-0, Name-1, Sex-2, Age-3, Height-4, Weight-5, Team-6, NOC-7, Games-8, Year-9, Season-10, City-11, Sport-12, Event-13, Medal-14
+    first_10_str = []
+    for i in range(10):
+        first_10_str.append(f'{medalists[i][1]}-{medalists[i][12]}-{medalists[i][14]}'.strip())
+
+    return first_10_str
 
 
 def get_total_medals(medalists):
