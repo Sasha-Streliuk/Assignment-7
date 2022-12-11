@@ -2,7 +2,19 @@ import argparse
 
 
 def country_year_validate(file_name, country, year):
-    pass
+    is_country = False
+    is_year = False
+    with open(file_name) as file:
+        attributes = file.readline()
+        for line in file:
+            row = line.split('\t')
+            if country in (row[6].strip(), row[7].strip()):
+                is_country = True
+            if int(row[9].strip()) == year:
+                is_year = True
+            if is_country and is_year:
+                return is_country, is_year
+    return is_country, is_year
 
 
 def get_medalists(file_name, country, year):
