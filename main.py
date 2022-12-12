@@ -62,57 +62,24 @@ def save_to_file(file_name, first_10, total_medals):
         file.write(f'\ngold={total_medals[0]}, silver={total_medals[1]}, bronze={total_medals[2]}')
 
 
-def all_countries_medals(file_name, year):
-    # ID-0, Name-1, Sex-2, Age-3, Height-4, Weight-5, Team-6, NOC-7, Games-8, Year-9, Season-10,
-    # City-11, Sport-12, Event-13, Medal-14
-    countries = {}
-    with open(file_name) as file:
-        attributes = file.readline()
-        for line in file:
-            row = line.split('\t')
-            if int(row[9].strip()) != year:
-                continue
-            country = row[6].strip()
-            if not countries.get(country):
-                countries[country] = {'gold': 0, 'silver': 0, 'bronze': 0 }
-            medal = row[14].strip().lower()
-            if medal == 'gold':
-                countries[country]['gold'] += 1
-            elif medal == 'silver':
-                countries[country]['silver'] += 1
-            elif medal == 'bronze':
-                countries[country]['bronze'] += 1
-
-    res = []
-    for country, medals in countries.items():
-        if medals['gold'] == 0 and medals['silver'] == 0 and medals['bronze'] == 0:
-            continue
-        res.append(f"{country}-{medals['gold']}-{medals['silver']}-{medals['bronze']}")
-    return res
-
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument('file_name')
 parser.add_argument('-medals', nargs=2, required=True)
 parser.add_argument('-output')
-parser.add_argument('-total', nargs=1, type=int)
-
 
 args = parser.parse_args()
 
 country, year = args.medals
 
-if args.medals:
-    country, year = args.medals
-    is_country, is_year = country_year_validate(args.file_name, country, int(year))
-    if not is_country:
-        print(f'{country} not exists')
-        exit()
+is_country, is_year = country_year_validate(args.file_name, country, int(year))
+if not is_country:
+    print(f'{country} not exists')
+    exit()
 
-    if not is_year:
-        print(f'In {year} {country} did not take part')
-        exit()
+if not is_year:
+    print(f'In {year} {country} did not take part')
+    exit()
 
 medalists = get_medalists(args.file_name, country, int(year))
 
@@ -126,15 +93,6 @@ else:
 total_medals = get_total_medals(medalists)
 print(f'gold={total_medals[0]}, silver={total_medals[1]}, bronze={total_medals[2]}')
 
-total_medals = get_total_medals(medalists)
-print(f'gold={total_medals[0]}, silver={total_medals[1]}, bronze={total_medals[2]}')
-
-
 if args.output:
     save_to_file(args.output, first_10, total_medals)
-elif args.total:
-    res = all_countries_medals(args.file_name, *args.total)
-    print('\n'.join(res))
-
-
 
