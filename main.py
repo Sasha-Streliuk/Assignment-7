@@ -60,3 +60,39 @@ def save_to_file(file_name, first_10, total_medals):
     with open(file_name, 'w') as file:
         file.write('\n'.join(first_10))
         file.write(f'\ngold={total_medals[0]}, silver={total_medals[1]}, bronze={total_medals[2]}')
+
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('file_name')
+parser.add_argument('-medals', nargs=2, required=True)
+parser.add_argument('-output')
+
+args = parser.parse_args()
+
+country, year = args.medals
+
+is_country, is_year = country_year_validate(args.file_name, country, int(year))
+if not is_country:
+    print(f'{country} not exists')
+    exit()
+
+if not is_year:
+    print(f'In {year} {country} did not take part')
+    exit()
+
+medalists = get_medalists(args.file_name, country, int(year))
+
+if len(medalists) < 10:
+    print(f'In {country} in {year} less than 10 medalists')
+    exit()
+else:
+    first_10 = get_first_10(medalists)
+    print('\n'.join(first_10))
+
+total_medals = get_total_medals(medalists)
+print(f'gold={total_medals[0]}, silver={total_medals[1]}, bronze={total_medals[2]}')
+
+if args.output:
+    save_to_file(args.output, first_10, total_medals)
+
