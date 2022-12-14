@@ -91,12 +91,41 @@ def all_countries_medals(file_name, year):
     return res
 
 
+def countries_medals_best_year(file_name, countries_lst):
+    # ID-0, Name-1, Sex-2, Age-3, Height-4, Weight-5, Team-6, NOC-7, Games-8, Year-9, Season-10, City-11, Sport-12, Event-13, Medal-14
+    countries = {}
+    for item in countries_lst:
+        countries[item] = {}
+
+    with open(file_name) as file:
+        attributes = file.readline()
+        for line in file:
+            row = line.split('\t')
+            if row[6].strip() not in countries_lst:
+                continue
+
+            country = row[6].strip()
+            year = int(row[9].strip())
+
+            if not countries[country].get(year):
+                countries[country][year] = 0
+
+            if row[14].strip() != 'NA':
+                countries[country][year] += 1
+
+    res = {}
+    for country, years in countries.items():
+        best_year = max(years)
+        res[country] = (best_year, years[best_year])
+    return res
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('file_name')
 parser.add_argument('-medals', nargs=2, required=True)
 parser.add_argument('-output')
 parser.add_argument('-total', nargs=1, type=int)
+parser.add_argument('-overall', nargs='*')
 
 
 args = parser.parse_args()
@@ -114,27 +143,30 @@ if args.medals:
         print(f'In {year} {country} did not take part')
         exit()
 
-medalists = get_medalists(args.file_name, country, int(year))
+    medalists = get_medalists(args.file_name, country, int(year))
 
-if len(medalists) < 10:
-    print(f'In {country} in {year} less than 10 medalists')
-    exit()
-else:
-    first_10 = get_first_10(medalists)
-    print('\n'.join(first_10))
+    if len(medalists) < 10:
+        print(f'In {country} in {year} less than 10 medalists')
+        exit()
+    else:
+        first_10 = get_first_10(medalists)
+        print('\n'.join(first_10))
 
-total_medals = get_total_medals(medalists)
-print(f'gold={total_medals[0]}, silver={total_medals[1]}, bronze={total_medals[2]}')
+    total_medals = get_total_medals(medalists)
+    print(f'gold={total_medals[0]}, silver={total_medals[1]}, bronze={total_medals[2]}')
 
-total_medals = get_total_medals(medalists)
-print(f'gold={total_medals[0]}, silver={total_medals[1]}, bronze={total_medals[2]}')
+    total_medals = get_total_medals(medalists)
+    print(f'gold={total_medals[0]}, silver={total_medals[1]}, bronze={total_medals[2]}')
 
+    if args.output:
+        save_to_file(args.output, first_10, total_medals)
 
-if args.output:
-    save_to_file(args.output, first_10, total_medals)
 elif args.total:
     res = all_countries_medals(args.file_name, *args.total)
     print('\n'.join(res))
 
-
+elif args.overall:
+    res = countries_medals_best_year(args.file_name, args.overall)
+    for country, best_result in res.items():
+        print(f'{country}: {best_result}')
 
