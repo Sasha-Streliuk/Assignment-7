@@ -59,4 +59,4 @@ def get_total_medals(medalists):
 def save_to_file(file_name, first_10, total_medals):
     with open(file_name, 'w') as file:
         file.write('\n'.join(first_10))
-        file.write(f'\ngold={total_medals[0]}, silver={total_medals[1]}, bronze={total_medals[2]}')
+        file.write(f'\ngold={total_medals[0]}, silver={total_medals[1]}, bronze={total_medals[2]}')git
