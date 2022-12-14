@@ -119,6 +119,80 @@ def countries_medals_best_year(file_name, countries_lst):
         res[country] = (best_year, years[best_year])
     return res
 
+def get_country_statistic(file_name, country):
+    # ID-0, Name-1, Sex-2, Age-3, Height-4, Weight-5, Team-6, NOC-7, Games-8, Year-9, Season-10, City-11, Sport-12, Event-13, Medal-14
+    country_statistic = {}
+
+    with open(file_name) as file:
+        attributes = file.readline()
+        for line in file:
+            row = line.split('\t')
+            if country in (row[6].strip(), row[7].strip()):
+                city = row[11].strip()
+                year = int(row[9].strip())
+                if not country_statistic.get((year, city)):
+                    country_statistic[(year, city)] = {'gold': 0, 'silver': 0, 'bronze': 0 }
+
+                medal = row[14].strip().lower()
+                if medal == 'gold':
+                    country_statistic[(year, city)]['gold'] += 1
+                elif medal == 'silver':
+                    country_statistic[(year, city)]['silver'] += 1
+                elif medal == 'bronze':
+                    country_statistic[(year, city)]['bronze'] += 1
+    return country_statistic
+
+def get_first_year(country_statistic):
+    keys = list(country_statistic.keys())
+    min_year = keys[0]
+    for year, city in keys:
+        if year < min_year[0]:
+            min_year = (year, city)
+    return min_year
+
+def best_year_city(country_statistic):
+    year_city = None
+    best_total = -1
+    for key, medals in country_statistic.items():
+        total = sum(medals.values())
+        if best_total < total:
+            best_total = total
+            year_city = key
+    return *year_city, best_total
+
+def worse_year_city(country_statistic):
+    year_city = None
+    worse_total = None
+    for key, medals in country_statistic.items():
+        total = sum(medals.values())
+        if total == 0:
+            return *key, total
+
+        if not worse_total:
+            worse_total = total
+            year_city = key
+            continue
+
+        if not worse_total:
+            worse_total = total
+            year_city = key
+            continue
+
+        if worse_total > total:
+            worse_total = total
+            year_city = key
+
+    return *year_city, worse_total
+
+
+def average_year_city(country_statistic):
+    year_city_avg = {}
+    for key, medals in country_statistic.items():
+        year_city_avg[key] = sum(medals.values())/3
+    return year_city_avg
+
+
+
 
 parser = argparse.ArgumentParser()
 parser.add_argument('file_name')
@@ -130,9 +204,24 @@ parser.add_argument('-overall', nargs='*')
 
 args = parser.parse_args()
 
-country, year = args.medals
+if args.interactive:
+    while True:
+        command = input('Name of country, stop - for exit: ')
+        if command.strip().lower() == 'stop':
+            break
+        country_statistic = get_country_statistic(args.file_name, command.strip())
+        first_year = get_first_year(country_statistic)
+        best_year = best_year_city(country_statistic)
+        worse_year = worse_year_city(country_statistic)
+        average_year = average_year_city(country_statistic)
+        print(f'First time: {first_year[0]}-{first_year[1]}')
+        print(f'Best year: {best_year[0]}-{best_year[1]}-{best_year[2]}')
+        print(f'Worse year: {worse_year[0]}-{worse_year[1]}-{worse_year[2]}')
+        for key, value in average_year.items():
+            print(key, value)
 
-if args.medals:
+
+elif args.medals:
     country, year = args.medals
     is_country, is_year = country_year_validate(args.file_name, country, int(year))
     if not is_country:
