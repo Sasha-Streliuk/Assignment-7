@@ -119,6 +119,7 @@ def countries_medals_best_year(file_name, countries_lst):
         res[country] = (best_year, years[best_year])
     return res
 
+
 def get_country_statistic(file_name, country):
     # ID-0, Name-1, Sex-2, Age-3, Height-4, Weight-5, Team-6, NOC-7, Games-8, Year-9, Season-10, City-11, Sport-12, Event-13, Medal-14
     country_statistic = {}
@@ -142,6 +143,7 @@ def get_country_statistic(file_name, country):
                     country_statistic[(year, city)]['bronze'] += 1
     return country_statistic
 
+
 def get_first_year(country_statistic):
     keys = list(country_statistic.keys())
     min_year = keys[0]
@@ -149,6 +151,7 @@ def get_first_year(country_statistic):
         if year < min_year[0]:
             min_year = (year, city)
     return min_year
+
 
 def best_year_city(country_statistic):
     year_city = None
@@ -159,6 +162,7 @@ def best_year_city(country_statistic):
             best_total = total
             year_city = key
     return *year_city, best_total
+
 
 def worse_year_city(country_statistic):
     year_city = None
@@ -192,15 +196,14 @@ def average_year_city(country_statistic):
     return year_city_avg
 
 
-
-
 parser = argparse.ArgumentParser()
+
 parser.add_argument('file_name')
-parser.add_argument('-medals', nargs=2, required=True)
+parser.add_argument('-medals', nargs=2)
 parser.add_argument('-output')
 parser.add_argument('-total', nargs=1, type=int)
 parser.add_argument('-overall', nargs='*')
-
+parser.add_argument('-interactive', nargs=1, type=bool)
 
 args = parser.parse_args()
 
@@ -254,7 +257,7 @@ elif args.total:
     res = all_countries_medals(args.file_name, *args.total)
     print('\n'.join(res))
 
-elif args.overall:
+if args.overall:
     res = countries_medals_best_year(args.file_name, args.overall)
     for country, best_result in res.items():
         print(f'{country}: {best_result}')
