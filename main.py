@@ -177,14 +177,10 @@ def worse_year_city(country_statistic):
             year_city = key
             continue
 
-        if not worse_total:
-            worse_total = total
-            year_city = key
-            continue
-
         if worse_total > total:
             worse_total = total
             year_city = key
+
 
     return *year_city, worse_total
 
@@ -245,13 +241,12 @@ elif args.medals:
         print('\n'.join(first_10))
 
     total_medals = get_total_medals(medalists)
-    print(f'gold={total_medals[0]}, silver={total_medals[1]}, bronze={total_medals[2]}')
-
-    total_medals = get_total_medals(medalists)
-    print(f'gold={total_medals[0]}, silver={total_medals[1]}, bronze={total_medals[2]}')
+    print('----------------------------------')
+    print(f'|gold={total_medals[0]},| silver={total_medals[1]},| bronze={total_medals[2]}|')
+    print('----------------------------------')
 
     if args.output:
-        save_to_file(args.output, first_10, total_medals)
+      save_to_file(args.output, first_10, total_medals)
 
 elif args.total:
     res = all_countries_medals(args.file_name, *args.total)
@@ -261,4 +256,5 @@ if args.overall:
     res = countries_medals_best_year(args.file_name, args.overall)
     for country, best_result in res.items():
         print(f'{country}: {best_result}')
+
 
